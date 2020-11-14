@@ -1,0 +1,36 @@
+body {
+    background-color: rgba(43,43,43,0.89);
+    color: ivory;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+div.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.container span {
+    padding: 0 1vw;
+}
+
+#sgv {
+    font-size: 9vw;
+}
+
+#delta {
+    font-size: 3vw;
+}
+
+#last_read {
+    font-size: 1vw;
+}
+
+#messages {
+    font-size: 1vw;
+    color: orangered;
+    margin: 1vw;
+}

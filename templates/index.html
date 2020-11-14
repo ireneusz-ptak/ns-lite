@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>(NS lite)</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='uPlot.min.css') }}">
+
+	</head>
+	<body>
+        <div class="container"><span id="sgv">...</span><span id="delta"></span></div>
+        <div class="container"><span id="last_read"></span></div>
+        <div id="messages">{% for msg in messages %}{{ msg }}<br>{% endfor %}</div>
+		<script src="{{ url_for('static', filename='uPlot.iife.min.js') }}"></script>
+		<script>
+            function showIssues(data) {
+                let issues = window.document.getElementById('issues');
+                issues.textContent = '';
+                data.forEach(item => issues.innerHTML = issues.innerHTML + item + '<br>');
+            }
+
+            function getSize() {
+				return {
+					width: Math.min(window.innerWidth - window.innerWidth*.2, 1200),
+					height: Math.min(window.innerHeight - window.innerHeight*.4, 600)
+				}
+			}
+
+			function setSGV(data) {
+                let sgv_last = data[1][data[1].length - 1];
+                let sgv_prev = data[1][data[1].length - 2];
+                let time_last = data[0][data[0].length - 1];
+                let time_prev = data[0][data[0].length - 2];
+
+                let last_read_num = Math.round((Date.now()/1000 - time_last)/60);
+
+                let last_read_str;
+
+                if (last_read_num === 0) {
+                    last_read_str = 'Just now';
+                } else if (last_read_num === 1) {
+                    last_read_str = '1 minute ago';
+                } else if (isNaN(last_read_num)) {
+                    last_read_str = 'No data available.';
+                } else {
+                    last_read_str = last_read_num + ' minutes ago';
+                }
+
+                last_read.textContent = last_read_str;
+
+                if (typeof time_last !== "undefined") {
+                    sgv.textContent = sgv_last;
+                }
+                else {
+                    sgv.textContent = ' --- ';
+                }
+
+                let delta_num = Math.round((sgv_last - sgv_prev)/((time_last - time_prev)/(5*60)));
+
+                if (isNaN(delta_num)) {
+                    delta.textContent = '?';
+                } else {
+                    let delta_prefix = '';
+                    if (delta_num > 0) {
+                        delta_prefix = '+'
+                    }
+                    delta.textContent = delta_prefix + delta_num.toString();
+                }
+
+                title[0].textContent = sgv.textContent + ' ' + delta.textContent + ' (NS lite)'
+
+            }
+
+			function makeChart(data) {
+				const opts = {
+					...getSize(),
+                    scales: {
+                        x: {
+                            time: true,
+                            range(u, dataMin, dataMax) {
+                                // 3 hours back, 20 minutes forward
+                                return [Date.now()/1000-(3*60*60), Date.now()/1000+(20*60)];
+						    },
+                        },
+                        y: {
+                            range: [0, 300],
+                        }
+                    },
+					series: [
+                        {
+                            label: "Time",
+                            value: "{HH}:{mm}",
+                        },
+						{
+							label: "SGV",
+                            stroke: "deepskyblue",
+                            width: 3,
+                            points: {
+							    size: 10,
+                                fill: "deepskyblue",
+                            },
+						},
+					],
+					axes: [
+						{
+						    values: "{HH}:{mm}",
+                            stroke: "snow",
+						},
+						{
+						    stroke: "snow",
+						},
+					]
+				};
+
+				let uplot = new uPlot(opts, data, document.body);
+
+				window.addEventListener("resize", e => {
+				    uplot.setSize(getSize());
+			    });
+
+				setInterval(function() {
+								fetch("{{ url_for('sgv_data') }}").then(r => r.json()).then(packed => {
+								    setSGV(packed);
+				                    uplot.setData(packed);
+			                    });
+				}, 10000);
+
+			}
+
+            let sgv = document.getElementById("sgv");
+            let delta = document.getElementById("delta");
+            let last_read = document.getElementById("last_read");
+            let title = document.getElementsByTagName("title");
+
+			fetch("{{ url_for('sgv_data') }}").then(r => r.json()).then(packed => {
+			    setSGV(packed);
+				makeChart(packed);
+			});
+
+		</script>
+	</body>
+</html>

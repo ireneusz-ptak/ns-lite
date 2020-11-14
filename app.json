@@ -1,0 +1,25 @@
+{
+  "name": "NS lite",
+  "repository": "https://github.com/ireneusz-ptak/ns-lite",
+  "env": {
+    "NSLITE_UNITS": {
+      "description": "BG units for NS lite ('mg/ml' or 'mmol')",
+      "value": "mg/ml",
+      "required": true
+    },
+    "NSLITE_TARGET": {
+      "description": "Address of your Nightscout page including the port number ('sample.herokuapp.com')",
+      "value": "",
+      "required": false
+    },
+    "API_SECRET": {
+      "description": "API_SECRET for getting the data into NS lite (has to be the same as in the target Nightscout page)",
+      "value": "",
+      "required": false
+    },
+    "SECRET_KEY": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    }
+  }
+}
