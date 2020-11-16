@@ -9,7 +9,7 @@ If you are already hosting your Nightscout app on Heroku be aware that using NS 
 Make sure you are not using NS lite longer than required.
 
 ## Warning2
-Current project state: dev, 0% tests coverage
+Current project state: dev completed(?), 0% tests coverage
 
 ## Usage
 After successful installation you should see a SGV value along with delta and time since last data was received.
@@ -34,4 +34,4 @@ NS lite shows only last 3 hours of data and doesn't store it permanently (you'll
 
 
 ## Tech stack
-Flask framework (Python) in the back, some JS and [uPlot](https://github.com/leeoniya/uPlot) for the graph in front.
+Flask framework (Python) with SQLite in the back, some JS and [uPlot](https://github.com/leeoniya/uPlot) for the graph in front.
